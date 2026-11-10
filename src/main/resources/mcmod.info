@@ -2,7 +2,7 @@
   {
     "modid": "${modid}",
     "name": "XAINOCHEAT",
-    "description": "A mod that is used as an example.",
+    "description": "XainoCheat is a simplest for Forge 1.8.9.",
     "version": "${version}",
     "mcversion": "${mcversion}",
     "url": "https://github.com/romangraef/Forge1.8.9Template/",
@@ -11,7 +11,7 @@
       "Sial"
     ],
     "credits": "",
-    "logoFile": "icon.png",
+    "logoFile": "icon.jpg",
     "screenshots": [],
     "dependencies": []
   }
