@@ -24,7 +24,7 @@ public class ExampleMod {
     public void init(FMLInitializationEvent event) {
         MinecraftForge.EVENT_BUS.register(this);
 
-        // Swing GUI in other stream, or game are break
+        // Swing GUI
         SwingUtilities.invokeLater(() -> {
             frame = new JFrame("ClickGUI");
             frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
@@ -79,11 +79,11 @@ public class ExampleMod {
         }
     }
 
-    // NoFall
+    // NoFall (fixed compilation error, now code is for 1.8.9 API)
     @SubscribeEvent
     public void onFall(LivingFallEvent event) {
-        if (noFallEnabled && event.getEntityLiving() == mc.thePlayer) {
-            event.setDistance(0.0F);
+        if (noFallEnabled && event.entityLiving == mc.thePlayer) {
+            event.distance = 0.0F;
         }
     }
 }
