@@ -11,10 +11,10 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 public class MixinGameSettings {
 
     // Change gamma settings
-    @Inject(method = "loadOptions", at = @At("TAIL"))
-    private void onLoadOptions(CallbackInfo ci) {
+    //@Inject(method = "loadOptions", at = @At("TAIL"))
+    //private void onLoadOptions(CallbackInfo ci) {
         // Change gamma to max
         // In Minecraft 1.8.9 variable gammaSetting have a float type.
-        ((GameSettings)(Object)this).gammaSetting = 100.0F; 
+        //((GameSettings)(Object)this).gammaSetting = 100.0F; 
     }
 }
