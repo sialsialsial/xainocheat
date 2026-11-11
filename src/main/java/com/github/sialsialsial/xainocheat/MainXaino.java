@@ -19,7 +19,7 @@ import javax.swing.*;
 import java.awt.*;
 
 @Mod(modid = "xainocheat", useMetadata = true)
-public class ExampleMod {
+public class XainoCheatMain {
     public static boolean creativeFlyEnabled = false;
     public static boolean flyEnabled = false;
     public static boolean noFallEnabled = false;
