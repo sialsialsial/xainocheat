@@ -20,10 +20,12 @@ import java.awt.*;
 
 @Mod(modid = "xainocheat", useMetadata = true)
 public class ExampleMod {
+    public static boolean creativeFlyEnabled = false;
     public static boolean flyEnabled = false;
     public static boolean noFallEnabled = false;
     public static boolean fullbrightEnabled = false;
     public static boolean espEnabled = false;
+    public static boolean jumpHackEnabled = false;
 
     private static final Minecraft mc = Minecraft.getMinecraft();
     private static JFrame frame;
@@ -39,12 +41,31 @@ public class ExampleMod {
             frame.setSize(300, 250);
             frame.setLayout(new FlowLayout());
 
+            JLabel MovementLabel = new JLabel("Movement");
+            
+            //Fly button
             JToggleButton flyBtn = new JToggleButton("Fly: OFF");
             flyBtn.addActionListener(e -> {
                 flyEnabled = flyBtn.isSelected();
                 flyBtn.setText("Fly: " + (flyEnabled ? "ON" : "OFF"));
             });
 
+            //CreativeFly button
+            JToggleButton creativeFlyBtn = new JToggleButton("Fly: OFF");
+            creativeFlyBtn.addActionListener(e -> {
+                creativeFlyEnabled = creativeFlyBtnBtn.isSelected();
+                creativeFlyBtn.setText("CreativeFly: " + (creativeFlyEnabled ? "ON" : "OFF"));
+            });
+
+            //JumpHack button
+            JToggleButton jumpHackBtn = new JToggleButton("JumpHack: OFF");
+            jumpHackBtn.setSelected(true);
+            jumpHackBtn.addActionListener(e -> {
+                jumpHackEnabled = jumpHackBtn.isSelected();
+                jumpHackBtn.setText("JumpHack: " + (jumpHackEnabled ? "ON" : "OFF"));
+            });
+
+            //NoFall button
             JToggleButton noFallBtn = new JToggleButton("NoFall: OFF");
             noFallBtn.setSelected(true);
             noFallBtn.addActionListener(e -> {
@@ -52,6 +73,9 @@ public class ExampleMod {
                 noFallBtn.setText("NoFall: " + (noFallEnabled ? "ON" : "OFF"));
             });
 
+            JLabel RenderLabel = new JLabel("Render");
+            
+            //FullBright button
             JToggleButton fbBtn = new JToggleButton("Fullbright: OFF");
             fbBtn.setSelected(true);
             fbBtn.addActionListener(e -> {
@@ -59,18 +83,24 @@ public class ExampleMod {
                 fbBtn.setText("Fullbright: " + (fullbrightEnabled ? "ON" : "OFF"));
             });
 
-            //ESP
+            //ESP button
             JToggleButton espBtn = new JToggleButton("ESP: OFF");
             espBtn.setSelected(true);
             espBtn.addActionListener(e -> {
                 espEnabled = espBtn.isSelected();
                 espBtn.setText("ESP: " + (espEnabled ? "ON" : "OFF"));
             });
-
+            frame.add(MovementLabel);
+            
             frame.add(flyBtn);
+            frame.add(creativeFlyBtn); //Added Button For CreativeFly
+            frame.add(jumpHackBtn); //Added Button For JumpHack
             frame.add(noFallBtn);
+            
+            frame.add(RenderLabel);
+            
             frame.add(fbBtn);
-            frame.add(espBtn); //Added Button For ESP
+            frame.add(espBtn);
             frame.setVisible(true);
         });
     }
@@ -80,23 +110,28 @@ public class ExampleMod {
         if (event.phase != TickEvent.Phase.END) return;
         if (mc.thePlayer == null) return;
 
-        // Fly
+        // Fly & CreativeFly & JumpHack
         if (flyEnabled) {
             mc.thePlayer.motionY = 0.0;
             if (mc.gameSettings.keyBindJump.isKeyDown()) mc.thePlayer.motionY = 0.5;
             if (mc.gameSettings.keyBindSneak.isKeyDown()) mc.thePlayer.motionY = -0.5;
             mc.thePlayer.capabilities.isFlying = true;
-        } else {
-            mc.thePlayer.capabilities.isFlying = false;
+        } else if (creativeFlyEnabled) {
+            mc.thePlayer.motionY = 0.0;
+            if (mc.gameSettings.keyBindJump.isKeyDown()) mc.thePlayer.motionY = 0.5;
+            if (mc.gameSettings.keyBindSneak.isKeyDown()) mc.thePlayer.motionY = -0.5;
+        } else if (jumpHackEnabled) {
+            if (mc.gameSettings.keyBindJump.isKeyDown()) mc.thePlayer.motionY = 0.5;
+            if (mc.gameSettings.keyBindSneak.isKeyDown()) mc.thePlayer.motionY = -0.5;
         }
 
-        // Fullbright - added some gamma
+        // Fullbright
         if (fullbrightEnabled) {
             mc.gameSettings.gammaSetting = 150.0F;
         }
     }
 
-    // NoFall - fixed compilation error, now are an other variant of that function
+    // NoFall
     @SubscribeEvent
     public void onFall(LivingFallEvent event) {
         if (noFallEnabled && event.entity == mc.thePlayer) {
@@ -104,7 +139,7 @@ public class ExampleMod {
         }
     }
 
-    // ESP - New Function
+    // ESP
     @SubscribeEvent
     public void onRenderWorldLast(RenderWorldLastEvent event) {
         if (!espEnabled || mc.theWorld == null || mc.thePlayer == null) return;
