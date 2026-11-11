@@ -96,12 +96,11 @@ public class ExampleMod {
         }
     }
 
-    // NoFall - edited to new variant
+    // NoFall - fixed compilation error, now are an other variant of that function
     @SubscribeEvent
     public void onFall(LivingFallEvent event) {
         if (noFallEnabled && event.getEntityLiving() == mc.thePlayer) {
-            event.setDamageMultiplier(0.0F);
-            event.setDistance(0.0F);
+            event.setCanceled(true);
         }
     }
 
