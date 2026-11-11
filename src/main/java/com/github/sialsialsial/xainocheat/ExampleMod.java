@@ -45,23 +45,32 @@ public class ExampleMod {
                 flyBtn.setText("Fly: " + (flyEnabled ? "ON" : "OFF"));
             });
 
-            JToggleButton noFallBtn = new JToggleButton("NoFall: ON");
+            JToggleButton noFallBtn = new JToggleButton("NoFall: OFF");
             noFallBtn.setSelected(true);
             noFallBtn.addActionListener(e -> {
                 noFallEnabled = noFallBtn.isSelected();
                 noFallBtn.setText("NoFall: " + (noFallEnabled ? "ON" : "OFF"));
             });
 
-            JToggleButton fbBtn = new JToggleButton("Fullbright: ON");
+            JToggleButton fbBtn = new JToggleButton("Fullbright: OFF");
             fbBtn.setSelected(true);
             fbBtn.addActionListener(e -> {
                 fullbrightEnabled = fbBtn.isSelected();
                 fbBtn.setText("Fullbright: " + (fullbrightEnabled ? "ON" : "OFF"));
             });
 
+            //ESP
+            JToggleButton espBtn = new JToggleButton("ESP: OFF");
+            espBtn.setSelected(true);
+            espBtn.addActionListener(e -> {
+                espEnabled = espBtn.isSelected();
+                espBtn.setText("ESP: " + (espEnabled ? "ON" : "OFF"));
+            });
+
             frame.add(flyBtn);
             frame.add(noFallBtn);
             frame.add(fbBtn);
+            frame.add(espBtn); //Added Button For ESP
             frame.setVisible(true);
         });
     }
