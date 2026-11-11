@@ -85,6 +85,6 @@ public class ExampleMod {
         if (noFallEnabled && event.getEntityLiving() == mc.thePlayer) {
             event.setDamageMultiplier(0.0F);
             event.setDistance(0.0F);
+        }
     }
-}
 }
