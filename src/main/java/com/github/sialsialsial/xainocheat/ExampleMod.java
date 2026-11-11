@@ -51,9 +51,9 @@ public class ExampleMod {
             });
 
             //CreativeFly button
-            JToggleButton creativeFlyBtn = new JToggleButton("Fly: OFF");
+            JToggleButton creativeFlyBtn = new JToggleButton("CreativeFly: OFF");
             creativeFlyBtn.addActionListener(e -> {
-                creativeFlyEnabled = creativeFlyBtnBtn.isSelected();
+                creativeFlyEnabled = creativeFlyBtn.isSelected();
                 creativeFlyBtn.setText("CreativeFly: " + (creativeFlyEnabled ? "ON" : "OFF"));
             });
 
