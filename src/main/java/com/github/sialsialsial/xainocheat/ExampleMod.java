@@ -14,7 +14,7 @@ import java.awt.*;
 @Mod(modid = "xainocheat", useMetadata = true)
 public class ExampleMod {
     public static boolean flyEnabled = false;
-    public static boolean noFallEnabled = true;
+    public static boolean noFallEnabled = false;
     public static boolean fullbrightEnabled = true;
 
     private static final Minecraft mc = Minecraft.getMinecraft();
@@ -73,17 +73,18 @@ public class ExampleMod {
             mc.thePlayer.capabilities.isFlying = false;
         }
 
-        // Fullbright
+        // Fullbright - added some gamma
         if (fullbrightEnabled) {
-            mc.gameSettings.gammaSetting = 100.0F;
+            mc.gameSettings.gammaSetting = 150.0F;
         }
     }
 
-    // NoFall (fixed compilation error, now code is for 1.8.9 API)
+    // NoFall - edited to new variant
     @SubscribeEvent
     public void onFall(LivingFallEvent event) {
-        if (noFallEnabled && event.entityLiving == mc.thePlayer) {
-            event.distance = 0.0F;
-        }
+        if (noFallEnabled && event.getEntityLiving() == mc.thePlayer) {
+            event.setDamageMultiplier(0.0F);
+            event.setDistance(0.0F);
     }
+}
 }
