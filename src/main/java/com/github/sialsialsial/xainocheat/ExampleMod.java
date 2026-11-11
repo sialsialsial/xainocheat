@@ -99,7 +99,7 @@ public class ExampleMod {
     // NoFall - fixed compilation error, now are an other variant of that function
     @SubscribeEvent
     public void onFall(LivingFallEvent event) {
-        if (noFallEnabled && event.getEntityLiving() == mc.thePlayer) {
+        if (noFallEnabled && event.entity == mc.thePlayer) {
             event.setCanceled(true);
         }
     }
