@@ -45,20 +45,16 @@ public class ClickGui extends GuiScreen {
     @Override
     public void initGui() {
         panels.clear();
-
-        Panel combat = new Panel("Combat", 20, 40);
-        combat.modules.add(new Module("KillAura", false));
-        combat.modules.add(new Module("Reach", false));
-        combat.modules.add(new Module("Velocity", true));
-
+        
         Panel movement = new Panel("Movement", 140, 40);
         movement.modules.add(new Module("Speed", false));
         movement.modules.add(new Module("Fly", false));
-        movement.modules.add(new Module("NoFall", true));
+        movement.modules.add(new Module("CreativeFly", false));
+        movement.modules.add(new Module("JumpHack", false));
+        movement.modules.add(new Module("NoFall", false));
 
         Panel render = new Panel("Render", 260, 40);
-        render.modules.add(new Module("ESP", true));
-        render.modules.add(new Module("Tracers", false));
+        render.modules.add(new Module("ESP", false));
         render.modules.add(new Module("FullBright", false));
 
         panels.add(combat);
