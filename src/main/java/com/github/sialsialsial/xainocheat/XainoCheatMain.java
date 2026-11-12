@@ -26,6 +26,7 @@ public class XainoCheatMain {
     public static boolean fullbrightEnabled = false;
     public static boolean espEnabled = false;
     public static boolean jumpHackEnabled = false;
+    public static boolean legacyUIEnabled = false;
 
     private static final Minecraft mc = Minecraft.getMinecraft();
     private static JFrame frame;
@@ -101,7 +102,7 @@ public class XainoCheatMain {
             
             frame.add(fbBtn);
             frame.add(espBtn);
-            frame.setVisible(true);
+            //frame.setVisible(true);
         });
     }
 
@@ -111,6 +112,7 @@ public class XainoCheatMain {
         if (mc.thePlayer == null) return;
 
         // Fly & CreativeFly & JumpHack
+        //Added: Legacy ClickGUI 
         if (flyEnabled) {
             mc.thePlayer.motionY = 0.0;
             if (mc.gameSettings.keyBindJump.isKeyDown()) mc.thePlayer.motionY = 0.5;
@@ -123,8 +125,12 @@ public class XainoCheatMain {
         } else if (jumpHackEnabled) {
             if (mc.gameSettings.keyBindJump.isKeyDown()) mc.thePlayer.motionY = 0.5;
             if (mc.gameSettings.keyBindSneak.isKeyDown()) mc.thePlayer.motionY = -0.5;
+        } else if (legacyUIEnabled == false) {
+            frame.setVisible(false);
+        } else if (legacyUIEnabled) {
+            frame.setVisible(true);
         }
-
+        
         // Fullbright
         if (fullbrightEnabled) {
             mc.gameSettings.gammaSetting = 150.0F;
