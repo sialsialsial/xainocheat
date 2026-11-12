@@ -94,8 +94,8 @@ public class XainoCheatMain {
             frame.add(MovementLabel);
             
             frame.add(flyBtn);
-            frame.add(creativeFlyBtn); //Added Button For CreativeFly
-            frame.add(jumpHackBtn); //Added Button For JumpHack
+            frame.add(creativeFlyBtn);
+            frame.add(jumpHackBtn);
             frame.add(noFallBtn);
             
             frame.add(RenderLabel);
@@ -112,7 +112,7 @@ public class XainoCheatMain {
         if (mc.thePlayer == null) return;
 
         // Fly & CreativeFly & JumpHack
-        //Added: Legacy ClickGUI 
+        // Now swing click-gui are legacy
         if (flyEnabled) {
             mc.thePlayer.motionY = 0.0;
             if (mc.gameSettings.keyBindJump.isKeyDown()) mc.thePlayer.motionY = 0.5;
