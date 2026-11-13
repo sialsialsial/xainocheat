@@ -1,25 +1,16 @@
 package com.github.sialsialsial.xainocheat;
 
 import net.minecraft.client.Minecraft;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.entity.living.LivingFallEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.common.event.FMLInitializationEvent;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
-import net.minecraftforge.fml.common.gameevent.InputEvent;
-
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiScreen;
-import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
-import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraft.client.renderer.GlStateManager;
-import net.minecraft.client.renderer.RenderGlobal;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.util.AxisAlignedBB;
+import net.minecraftforge.client.event.RenderWorldLastEvent;
+import net.minecraftforge.common.MinecraftForge;
+import net.minecraftforge.event.entity.living.LivingFallEvent;
+import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
+import net.minecraftforge.fml.common.gameevent.TickEvent;
 import org.lwjgl.opengl.GL11;
-import org.lwjgl.input.Keyboard;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -44,7 +35,7 @@ public class ClickGui extends GuiScreen {
         public void toggle() { this.enabled = !this.enabled; }
     }
 
-    //Category
+    // Category
     public enum Category {
         COMBAT("Combat"),
         MOVEMENT("Movement"),
@@ -54,6 +45,7 @@ public class ClickGui extends GuiScreen {
         Category(String title) { this.title = title; }
     }
 
+    // ModuleManager
     public static class ModuleManager {
         private static final List<Module> modules = new ArrayList<>();
 
@@ -84,6 +76,7 @@ public class ClickGui extends GuiScreen {
         }
     }
 
+    // Panel
     private static class Panel {
         final Category category;
         int x, y;
@@ -203,11 +196,142 @@ public class ClickGui extends GuiScreen {
 
     public static class TickHandler {
         private final Minecraft mc = Minecraft.getMinecraft();
-        // Modules Aliases
-        Module fullbright = ModuleManager.getByName("FullBright");
-        Module nofall = ModuleManager.getByName("NoFall");
-        Module jumphack = ModuleManager.getByName("JumpHack");
-        Module fly = ModuleManager.getByName("Fly");
-        Module esp = ModuleManager.getByName("ESP");
+        private float normalGamma = -1.0F;
+        public static void register() {
+            MinecraftForge.EVENT_BUS.register(new TickHandler());
+        }
+
+        @SubscribeEvent
+        public void onClientTick(TickEvent.ClientTickEvent event) {
+            if (event.phase != TickEvent.Phase.END) return;
+            if (mc.thePlayer == null || mc.theWorld == null) return;
+
+            Module fullbright = ModuleManager.getByName("FullBright");
+            Module jumphack   = ModuleManager.getByName("JumpHack");
+            Module fly   = ModuleManager.getByName("Fly");
+
+            // FullBright
+            if (fullbright != null && fullbright.isEnabled()) {
+                if (normalGamma < 0.0F) {
+                    normalGamma = mc.gameSettings.gammaSetting;
+                }
+                mc.gameSettings.gammaSetting = 150.0F;
+            } else if (normalGamma >= 0.0F) {
+                mc.gameSettings.gammaSetting = normalGamma;
+                normalGamma = -1.0F;
+            }
+            // JumpHack
+            if (jumphack != null && jumphack.isEnabled()) {
+                if (mc.gameSettings.keyBindJump.isKeyDown())  mc.thePlayer.motionY = 0.5;
+                if (mc.gameSettings.keyBindSneak.isKeyDown()) mc.thePlayer.motionY = -0.5;
+            }
+            //Fly
+            if (fly != null && fly.isEnabled()) {
+                float yaw = (float) Math.toRadians(mc.thePlayer.rotationYaw);
+                double speed = 0.8;
+                double mx = 0.0, mz = 0.0, my = 0.0;
+
+                if (mc.gameSettings.keyBindJump.isKeyDown())  my =  0.5;
+                if (mc.gameSettings.keyBindSneak.isKeyDown()) my = -0.5;
+
+                if (mc.gameSettings.keyBindForward.isKeyDown()) {
+                    mx -= Math.sin(yaw) * speed;
+                    mz += Math.cos(yaw) * speed;
+                }
+                if (mc.gameSettings.keyBindBack.isKeyDown()) {
+                    mx += Math.sin(yaw) * speed;
+                    mz -= Math.cos(yaw) * speed;
+                }
+                // Стрейфыы
+                if (mc.gameSettings.keyBindLeft.isKeyDown()) {
+                    mx -= Math.cos(yaw) * speed;
+                    mz -= Math.sin(yaw) * speed;
+                }
+                if (mc.gameSettings.keyBindRight.isKeyDown()) {
+                    mx += Math.cos(yaw) * speed;
+                    mz += Math.sin(yaw) * speed;
+                }
+
+                mc.thePlayer.motionX = mx;
+                mc.thePlayer.motionY = my;
+                mc.thePlayer.motionZ = mz;
+            }
+        }
+
+        // ESP
+        @SubscribeEvent
+        public void onRenderWorldLast(RenderWorldLastEvent event) {
+            Module esp = ModuleManager.getByName("ESP");
+            if (esp == null || !esp.isEnabled()) return;
+            if (mc.thePlayer == null || mc.theWorld == null) return;
+
+            float partialTicks = event.partialTicks;
+            EntityPlayer player = mc.thePlayer;
+
+            double px = player.lastTickPosX + (player.posX - player.lastTickPosX) * partialTicks;
+            double py = player.lastTickPosY + (player.posY - player.lastTickPosY) * partialTicks;
+            double pz = player.lastTickPosZ + (player.posZ - player.lastTickPosZ) * partialTicks;
+
+            // saving OpenGL status
+            GlStateManager.pushMatrix();
+            GlStateManager.disableTexture2D();
+            GlStateManager.disableDepth();
+            GlStateManager.depthMask(false);
+            GlStateManager.enableBlend();
+            GlStateManager.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+            GL11.glLineWidth(2.0F);
+            GL11.glColor4f(1.0F, 0.0F, 0.0F, 1.0F);
+
+            GL11.glPushMatrix();
+            GL11.glTranslated(-px, -py, -pz);
+
+            for (EntityPlayer target : mc.theWorld.playerEntities) {
+                if (target == player) continue;
+
+                double tx = target.lastTickPosX + (target.posX - target.lastTickPosX) * partialTicks;
+                double ty = target.lastTickPosY + (target.posY - target.lastTickPosY) * partialTicks;
+                double tz = target.lastTickPosZ + (target.posZ - target.lastTickPosZ) * partialTicks;
+
+                AxisAlignedBB box = target.getEntityBoundingBox()
+                        .offset(tx - target.posX, ty - target.posY, tz - target.posZ)
+                        .expand(0.1, 0.1, 0.1);
+
+                GL11.glBegin(GL11.GL_LINES);
+
+                GL11.glVertex3d(box.minX, box.minY, box.minZ); GL11.glVertex3d(box.maxX, box.minY, box.minZ);
+                GL11.glVertex3d(box.maxX, box.minY, box.minZ); GL11.glVertex3d(box.maxX, box.minY, box.maxZ);
+                GL11.glVertex3d(box.maxX, box.minY, box.maxZ); GL11.glVertex3d(box.minX, box.minY, box.maxZ);
+                GL11.glVertex3d(box.minX, box.minY, box.maxZ); GL11.glVertex3d(box.minX, box.minY, box.minZ);
+
+                GL11.glVertex3d(box.minX, box.maxY, box.minZ); GL11.glVertex3d(box.maxX, box.maxY, box.minZ);
+                GL11.glVertex3d(box.maxX, box.maxY, box.minZ); GL11.glVertex3d(box.maxX, box.maxY, box.maxZ);
+                GL11.glVertex3d(box.maxX, box.maxY, box.maxZ); GL11.glVertex3d(box.minX, box.maxY, box.maxZ);
+                GL11.glVertex3d(box.minX, box.maxY, box.maxZ); GL11.glVertex3d(box.minX, box.maxY, box.minZ);
+
+                GL11.glVertex3d(box.minX, box.minY, box.minZ); GL11.glVertex3d(box.minX, box.maxY, box.minZ);
+                GL11.glVertex3d(box.maxX, box.minY, box.minZ); GL11.glVertex3d(box.maxX, box.maxY, box.minZ);
+                GL11.glVertex3d(box.maxX, box.minY, box.maxZ); GL11.glVertex3d(box.maxX, box.maxY, box.maxZ);
+                GL11.glVertex3d(box.minX, box.minY, box.maxZ); GL11.glVertex3d(box.minX, box.maxY, box.maxZ);
+                GL11.glEnd();
+            }
+
+            GL11.glPopMatrix();
+
+            // Recovery OpenGL
+            GlStateManager.disableBlend();
+            GlStateManager.depthMask(true);
+            GlStateManager.enableDepth();
+            GlStateManager.enableTexture2D();
+            GlStateManager.popMatrix();
+        }
+
+        // NoFall
+        @SubscribeEvent
+        public void onFall(LivingFallEvent event) {
+            Module nofall = ModuleManager.getByName("NoFall");
+            if (nofall != null && nofall.isEnabled()) {
+                event.setCanceled(true);
+            }
+        }
     }
 }
