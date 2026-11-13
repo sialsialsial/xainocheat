@@ -106,6 +106,17 @@ public class XainoCheatMain {
         });
     }
 
+    // Added: The New ClickGui`s menu bind
+    @SubscribeEvent
+    public void onKey(InputEvent.KeyInputEvent event) {
+        if (Minecraft.getMinecraft().thePlayer == null) return;
+        if (Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
+            if (!(Minecraft.getMinecraft().currentScreen instanceof ClickGui)) {
+                Minecraft.getMinecraft().displayGuiScreen(new ClickGui());
+            }
+        }
+    }
+    
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
