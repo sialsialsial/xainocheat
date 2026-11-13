@@ -104,7 +104,7 @@ public class XainoCheatMain {
             frame.add(fbBtn);
             frame.add(espBtn);
             //frame.setVisible(true);
-        });
+        };
     }
 
     // Added: The New ClickGui`s menu bind
