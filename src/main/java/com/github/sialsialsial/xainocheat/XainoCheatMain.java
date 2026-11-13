@@ -112,13 +112,12 @@ public class XainoCheatMain {
     @SubscribeEvent
     public void onKey(InputEvent.KeyInputEvent event) {
         if (Minecraft.getMinecraft().thePlayer == null) return;
-        if (Keyboard.isKeyDown(Keyboard.KEY_RSHIFT)) {
-            if (!(Minecraft.getMinecraft().currentScreen instanceof ClickGui)) {
-                Minecraft.getMinecraft().displayGuiScreen(new ClickGui());
-            }
+        if (!Keyboard.getEventKeyState()) return;
+        int key = Keyboard.getEventKey();
+        if (key == Keyboard.KEY_LSHIFT || key == Keyboard.KEY_RSHIFT) {
+            mc.displayGuiScreen(new ClickGui());
         }
     }
-    
     @SubscribeEvent
     public void onClientTick(TickEvent.ClientTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
