@@ -203,5 +203,11 @@ public class ClickGui extends GuiScreen {
 
     public static class TickHandler {
         private final Minecraft mc = Minecraft.getMinecraft();
+        // Modules Aliases
+        Module fullbright = ModuleManager.getByName("FullBright");
+        Module nofall = ModuleManager.getByName("NoFall");
+        Module jumphack = ModuleManager.getByName("JumpHack");
+        Module fly = ModuleManager.getByName("Fly");
+        Module esp = ModuleManager.getByName("ESP");
     }
 }
