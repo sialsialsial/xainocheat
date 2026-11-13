@@ -149,34 +149,34 @@ public class XainoCheatMain {
         }
 
         // Added: KillAura
-        if (killAuraEnabled) {
-        EntityPlayer target = null;
-        double closestDist = 4.0;
+        //if (killAuraEnabled) {
+        //EntityPlayer target = null;
+        //double closestDist = 4.0;
 
-        for (EntityPlayer p : mc.theWorld.playerEntities) {
-            if (p == mc.thePlayer || p.isDead || p.getHealth() <= 0) continue;
+        //for (EntityPlayer p : mc.theWorld.playerEntities) {
+            //if (p == mc.thePlayer || p.isDead || p.getHealth() <= 0) continue;
         
-            double dist = mc.thePlayer.getDistanceToEntity(p);
-            if (dist < closestDist) {
-                closestDist = dist;
-                target = p;
-            }
-        }
+            //double dist = mc.thePlayer.getDistanceToEntity(p);
+            //if (dist < closestDist) {
+                //closestDist = dist;
+                //target = p;
+            //}
+        //}
 
-        if (target != null) {
-            double dx = target.posX - mc.thePlayer.posX;
-            double dz = target.posZ - mc.thePlayer.posZ;
-            double dy = (target.posY + target.getEyeHeight()) - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
-            double dist = MathHelper.sqrt_double(dx * dx + dz * dz);
+        //if (target != null) {
+            //double dx = target.posX - mc.thePlayer.posX;
+            //double dz = target.posZ - mc.thePlayer.posZ;
+            //double dy = (target.posY + target.getEyeHeight()) - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
+            //double dist = MathHelper.sqrt_double(dx * dx + dz * dz);
             
-            float yaw = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0F;
-            float pitch = (float) (-(Math.atan2(dy, dist) * 180.0 / Math.PI));
+            //float yaw = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0F;
+            //float pitch = (float) (-(Math.atan2(dy, dist) * 180.0 / Math.PI));
             
-            mc.thePlayer.rotationYaw = yaw;
-            mc.thePlayer.rotationPitch = pitch;
-            mc.playerController.attackEntity(mc.thePlayer, target);
-            mc.thePlayer.swingItem();
-        }
+            //mc.thePlayer.rotationYaw = yaw;
+            //mc.thePlayer.rotationPitch = pitch;
+            //mc.playerController.attackEntity(mc.thePlayer, target);
+            //mc.thePlayer.swingItem();
+        //}
     }
 
     // NoFall
