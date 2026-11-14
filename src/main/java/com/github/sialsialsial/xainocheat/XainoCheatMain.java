@@ -39,7 +39,6 @@ public class XainoCheatMain {
         MinecraftForge.EVENT_BUS.register(this);
         ClickGui.ModuleManager.init();
         FMLCommonHandler.instance().bus().register(new ClickGui.TickHandler());
-        ModuleManager.init();
 
         // Swing GUI
         SwingUtilities.invokeLater(() -> {
