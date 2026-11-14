@@ -8,6 +8,7 @@ import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
+import net.minecraftforge.fml.common.FMLCommonHandler;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -140,7 +141,7 @@ public class XainoCheatMain {
         } else if (jumpHackEnabled) {
             if (mc.gameSettings.keyBindJump.isKeyDown()) mc.thePlayer.motionY = 0.5;
             if (mc.gameSettings.keyBindSneak.isKeyDown()) mc.thePlayer.motionY = -0.5;
-        } else if (legacyUIEnabled == false) {
+        } if (legacyUIEnabled == false) {
             frame.setVisible(false);
         } else if (legacyUIEnabled) {
             frame.setVisible(true);
