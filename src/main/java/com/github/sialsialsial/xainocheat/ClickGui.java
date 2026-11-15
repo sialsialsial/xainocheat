@@ -197,6 +197,7 @@ public class ClickGui extends GuiScreen {
     public static class TickHandler {
         private final Minecraft mc = Minecraft.getMinecraft();
         private float normalGamma = -1.0F;
+        private long lastAttackTime = 0; // Added for KillAura Module
         public static void register() {
             MinecraftForge.EVENT_BUS.register(new TickHandler());
         }
@@ -209,6 +210,7 @@ public class ClickGui extends GuiScreen {
             Module fullbright = ModuleManager.getByName("FullBright");
             Module jumphack   = ModuleManager.getByName("JumpHack");
             Module fly   = ModuleManager.getByName("Fly");
+            Module killaura = ModuleManager.getByName("KillAura");
 
             // FullBright
             if (fullbright != null && fullbright.isEnabled()) {
@@ -225,7 +227,7 @@ public class ClickGui extends GuiScreen {
                 if (mc.gameSettings.keyBindJump.isKeyDown())  mc.thePlayer.motionY = 0.5;
                 if (mc.gameSettings.keyBindSneak.isKeyDown()) mc.thePlayer.motionY = -0.5;
             }
-            //Fly
+            // Fly
             if (fly != null && fly.isEnabled()) {
                 float yaw = (float) Math.toRadians(mc.thePlayer.rotationYaw);
                 double speed = 0.8;
@@ -255,6 +257,40 @@ public class ClickGui extends GuiScreen {
                 mc.thePlayer.motionX = mx;
                 mc.thePlayer.motionY = my;
                 mc.thePlayer.motionZ = mz;
+            }
+            // Added: KillAura
+            if (killaura != null && killaura.isEnabled()) {
+                long now = System.currentTimeMillis();
+                if (now - lastAttackTime >= 100) {
+                    EntityPlayer target = null;
+                    double closestDist = 4.0;
+
+                    for (EntityPlayer p : mc.theWorld.playerEntities) {
+                        if (p == mc.thePlayer || p.isDead || p.getHealth() <= 0) continue;
+
+                        double dist = mc.thePlayer.getDistanceToEntity(p);
+                        if (dist < closestDist) {
+                            closestDist = dist;
+                            target = p;
+                        }
+                    }
+                    if (target != null) {
+                        double dx = target.posX - mc.thePlayer.posX;
+                        double dz = target.posZ - mc.thePlayer.posZ;
+                        double dy = (target.posY + target.getEyeHeight()) - (mc.thePlayer.posY + mc.thePlayer.getEyeHeight());
+                        double dist = MathHelper.sqrt_double(dx * dx + dz * dz);
+
+                        float yaw = (float) (Math.atan2(dz, dx) * 180.0 / Math.PI) - 90.0F;
+                        float pitch = (float) (-(Math.atan2(dy, dist) * 180.0 / Math.PI));
+
+                        mc.thePlayer.rotationYaw = yaw;
+                        mc.thePlayer.rotationPitch = pitch;
+                        mc.playerController.attackEntity(mc.thePlayer, target);
+                        mc.thePlayer.swingItem();
+
+                        lastAttackTime = now;
+                    }
+                }
             }
         }
 
