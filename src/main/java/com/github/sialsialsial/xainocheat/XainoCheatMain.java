@@ -1,4 +1,4 @@
-ackage com.github.sialsialsial.xainocheat;
+package com.github.sialsialsial.xainocheat;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
