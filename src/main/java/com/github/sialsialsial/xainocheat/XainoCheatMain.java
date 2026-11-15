@@ -1,4 +1,4 @@
-package com.github.sialsialsial.xainocheat;
+ackage com.github.sialsialsial.xainocheat;
 
 import net.minecraft.client.Minecraft;
 import net.minecraftforge.common.MinecraftForge;
@@ -118,7 +118,7 @@ public class XainoCheatMain {
         if (Minecraft.getMinecraft().thePlayer == null) return;
         if (!Keyboard.getEventKeyState()) return;
         int key = Keyboard.getEventKey();
-        if (key == Keyboard.KEY_LSHIFT || key == Keyboard.KEY_RSHIFT) {
+        if (key == Keyboard.KEY_RSHIFT) {
             mc.displayGuiScreen(new ClickGui());
         }
     }
