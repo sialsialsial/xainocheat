@@ -2,9 +2,9 @@
 
 ## Modules
 1. Fly
-2. NoFall
+2. KillAura
 3. ESP
-4. CreativeFly
+4. NoFall
 5. JumpHack
 ## Usage
 1. Install Minecraft Forge 1.8.9
