@@ -276,7 +276,7 @@ public class XainoCheatMain {
         if (event.phase != TickEvent.Phase.END) return;
         if (mc.thePlayer == null) return;
         
-        ScaledResolution sr = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+        ScaledResolution sr = new ScaledResolution(mc); // Fixed Compil crash
         int screenW = sr.getScaledWidth();
         int screenH = sr.getScaledHeight();
         
@@ -312,7 +312,7 @@ public class XainoCheatMain {
         if (Mouse.getEventButton() != 0 || !Mouse.getEventButtonState()) return;
         if (mc.thePlayer == null) return;
 
-        ScaledResolution sr = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+        ScaledResolution sr = new ScaledResolution(mc); // Fixed compil crash
         int mouseX = Mouse.getEventX() * sr.getScaledWidth() / mc.displayWidth;
         int mouseY = sr.getScaledHeight() - Mouse.getEventY() * sr.getScaledHeight() / mc.displayHeight - 1;
 
