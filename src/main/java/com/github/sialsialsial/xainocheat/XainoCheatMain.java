@@ -1,6 +1,10 @@
 package com.github.sialsialsial.xainocheat;
 
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
+import net.minecraft.util.ResourceLocation;
+
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.entity.living.LivingFallEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -9,6 +13,8 @@ import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.gameevent.TickEvent;
 import net.minecraftforge.fml.common.gameevent.InputEvent;
 import net.minecraftforge.fml.common.FMLCommonHandler;
+import net.minecraftforge.client.event.RenderGameOverlayEvent;
+import net.minecraftforge.client.event.MouseEvent;
 
 import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.RenderGlobal;
@@ -17,6 +23,7 @@ import net.minecraft.util.AxisAlignedBB;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.input.Keyboard;
+import org.lwjgl.input.Mouse;
 
 import javax.swing.*;
 import java.awt.*;
@@ -31,6 +38,15 @@ public class XainoCheatMain {
     public static boolean jumpHackEnabled = false;
     public static boolean legacyUIEnabled = false;
     public static boolean killAuraEnabled = false;
+
+    // Added: statics for modmenu`s icon
+
+    private static final ResourceLocation MOD_ICON = new ResourceLocation("xainocheat:modmenuicon.png");
+    private static int iconX = 10;
+    private static int iconY = 10;
+    private static final int ICON_SIZE = 32;
+    private static int iconSpeedX = 1;
+    private static int iconSpeedY = 1;
 
     private static final Minecraft mc = Minecraft.getMinecraft();
     private static JFrame frame;
@@ -251,5 +267,57 @@ public class XainoCheatMain {
         GlStateManager.enableDepth();
         GlStateManager.enableTexture2D();
         GlStateManager.popMatrix();
+    }
+    
+    // Added: modmenuicon movement subscribe event
+    @SubscribeEvent
+    public void onIconTick(TickEvent.ClientTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
+        if (mc.thePlayer == null) return;
+        
+        ScaledResolution sr = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+        int screenW = sr.getScaledWidth();
+        int screenH = sr.getScaledHeight();
+        
+        iconX += iconSpeedX;
+        iconY += iconSpeedY;
+
+        if (iconX < 0) { iconX = 0; iconSpeedX = Math.abs(iconSpeedX); }
+        if (iconY < 0) { iconY = 0; iconSpeedY = Math.abs(iconSpeedY); }
+        if (iconX + ICON_SIZE > screenW) { iconX = screenW - ICON_SIZE; iconSpeedX = -Math.abs(iconSpeedX); }
+        if (iconY + ICON_SIZE > screenH) { iconY = screenH - ICON_SIZE; iconSpeedY = -Math.abs(iconSpeedY); }
+    }
+    
+    // Added: drawing of modmenuicon, overlay
+    @SubscribeEvent
+    public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
+        if (event.type != RenderGameOverlayEvent.ElementType.ALL) return;
+        if (mc.thePlayer == null) return;
+
+        mc.getTextureManager().bindTexture(MOD_ICON);
+        GlStateManager.enableBlend();
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        Gui.drawModalRectWithCustomSizedTexture(
+            iconX, iconY,
+            0, 0,
+            ICON_SIZE, ICON_SIZE,
+            ICON_SIZE, ICON_SIZE
+        );
+        GlStateManager.disableBlend();
+    }
+    // Added: обработка клика для modmenuicon, subscribe event
+    @SubscribeEvent
+    public void onGuiMouseInput(GuiScreenEvent.MouseInputEvent.Pre event) {
+        if (Mouse.getEventButton() != 0 || !Mouse.getEventButtonState()) return;
+        if (mc.thePlayer == null) return;
+
+        ScaledResolution sr = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+        int mouseX = Mouse.getEventX() * sr.getScaledWidth() / mc.displayWidth;
+        int mouseY = sr.getScaledHeight() - Mouse.getEventY() * sr.getScaledHeight() / mc.displayHeight - 1;
+
+        if (mouseX >= iconX && mouseX <= iconX + ICON_SIZE && mouseY >= iconY && mouseY <= iconY + ICON_SIZE) {
+            mc.displayGuiScreen(new ClickGui());
+            event.setCanceled(true);
+        }
     }
 }
