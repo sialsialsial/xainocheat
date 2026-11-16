@@ -245,14 +245,15 @@ public class ClickGui extends GuiScreen {
                     mx += Math.sin(yaw) * speed;
                     mz -= Math.cos(yaw) * speed;
                 }
+                // Fixed: strafe movement directions
                 // Стрейфыы
                 if (mc.gameSettings.keyBindLeft.isKeyDown()) {
-                    mx -= Math.cos(yaw) * speed;
-                    mz -= Math.sin(yaw) * speed;
-                }
-                if (mc.gameSettings.keyBindRight.isKeyDown()) {
                     mx += Math.cos(yaw) * speed;
                     mz += Math.sin(yaw) * speed;
+                }
+                if (mc.gameSettings.keyBindRight.isKeyDown()) {
+                    mx -= Math.cos(yaw) * speed;
+                    mz -= Math.sin(yaw) * speed;
                 }
 
                 mc.thePlayer.motionX = mx;
