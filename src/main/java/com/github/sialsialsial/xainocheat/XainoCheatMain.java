@@ -45,6 +45,16 @@ public class XainoCheatMain {
     private static final ResourceLocation MOD_ICON = new ResourceLocation("xainocheat:modmenuicon.png");
     private static int iconX = 10;
     private static int iconY = 10;
+    private static boolean iconDragging = false;
+    private static int iconDragOffsetX = 0;
+    private static int iconDragOffsetY = 0;
+
+    private static int iconPressMouseX = 0;
+    private static int iconPressMouseY = 0;
+    private static long iconPressTime = 0;
+    private static final int CLICK_DRAG_THRESHOLD = 5;   // пикселей — порог клик/драг
+    private static final long CLICK_TIME_THRESHOLD = 300; // мс — макс. время клика
+    
     private static final int ICON_SIZE = 32;
     private static int iconSpeedX = 1;
     private static int iconSpeedY = 1;
@@ -270,25 +280,7 @@ public class XainoCheatMain {
         GlStateManager.popMatrix();
     }
     
-    // Added: modmenuicon movement subscribe event
-    @SubscribeEvent
-    public void onIconTick(TickEvent.ClientTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-        if (mc.thePlayer == null) return;
-        
-        ScaledResolution sr = new ScaledResolution(mc); // Fixed Compil crash
-        int screenW = sr.getScaledWidth();
-        int screenH = sr.getScaledHeight();
-        
-        iconX += iconSpeedX;
-        iconY += iconSpeedY;
 
-        if (iconX < 0) { iconX = 0; iconSpeedX = Math.abs(iconSpeedX); }
-        if (iconY < 0) { iconY = 0; iconSpeedY = Math.abs(iconSpeedY); }
-        if (iconX + ICON_SIZE > screenW) { iconX = screenW - ICON_SIZE; iconSpeedX = -Math.abs(iconSpeedX); }
-        if (iconY + ICON_SIZE > screenH) { iconY = screenH - ICON_SIZE; iconSpeedY = -Math.abs(iconSpeedY); }
-    }
-    
     // Added: drawing of modmenuicon, overlay
     @SubscribeEvent
     public void onRenderOverlay(RenderGameOverlayEvent.Post event) {
@@ -306,19 +298,57 @@ public class XainoCheatMain {
         );
         GlStateManager.disableBlend();
     }
-    // Added: обработка клика для modmenuicon, subscribe event
+    // Added: обработка клика для modmenuicon, subscribe event, перетаск.
     @SubscribeEvent
     public void onGuiMouseInput(GuiScreenEvent.MouseInputEvent.Pre event) {
-        if (Mouse.getEventButton() != 0 || !Mouse.getEventButtonState()) return;
         if (mc.thePlayer == null) return;
+        if (Mouse.getEventButton() != 0) return;
 
-        ScaledResolution sr = new ScaledResolution(mc); // Fixed compil crash
+        ScaledResolution sr = new ScaledResolution(mc);
         int mouseX = Mouse.getEventX() * sr.getScaledWidth() / mc.displayWidth;
         int mouseY = sr.getScaledHeight() - Mouse.getEventY() * sr.getScaledHeight() / mc.displayHeight - 1;
 
-        if (mouseX >= iconX && mouseX <= iconX + ICON_SIZE && mouseY >= iconY && mouseY <= iconY + ICON_SIZE) {
-            mc.displayGuiScreen(new ClickGui());
+        boolean overIcon = mouseX >= iconX && mouseX <= iconX + ICON_SIZE
+                    && mouseY >= iconY && mouseY <= iconY + ICON_SIZE;
+
+        if (Mouse.getEventButtonState() && overIcon) {
+            iconDragging = true;
+            iconDragOffsetX = mouseX - iconX;
+            iconDragOffsetY = mouseY - iconY;
+            iconPressMouseX = mouseX;
+            iconPressMouseY = mouseY;
+            iconPressTime = System.currentTimeMillis();
             event.setCanceled(true);
+            return;
         }
+
+        if (!Mouse.getEventButtonState() && iconDragging) {
+            iconDragging = false;
+            event.setCanceled(true);
+
+            long elapsed = System.currentTimeMillis() - iconPressTime;
+            int dx = Math.abs(mouseX - iconPressMouseX);
+            int dy = Math.abs(mouseY - iconPressMouseY);
+
+            if (dx <= CLICK_DRAG_THRESHOLD && dy <= CLICK_DRAG_THRESHOLD && elapsed <= CLICK_TIME_THRESHOLD) {
+                mc.displayGuiScreen(new ClickGui());
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public void onMouseMove(MouseEvent event) {
+        if (!iconDragging) return;
+        if (mc.thePlayer == null) return;
+
+        ScaledResolution sr = new ScaledResolution(mc);
+        int mouseX = Mouse.getX() * sr.getScaledWidth() / mc.displayWidth;
+        int mouseY = sr.getScaledHeight() - Mouse.getY() * sr.getScaledHeight() / mc.displayHeight - 1;
+
+        iconX = mouseX - iconDragOffsetX;
+        iconY = mouseY - iconDragOffsetY;
+
+        iconX = Math.max(0, Math.min(iconX, sr.getScaledWidth() - ICON_SIZE));
+        iconY = Math.max(0, Math.min(iconY, sr.getScaledHeight() - ICON_SIZE));
     }
 }
