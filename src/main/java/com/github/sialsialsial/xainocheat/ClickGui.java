@@ -1,5 +1,13 @@
 package com.github.sialsialsial.xainocheat;
 
+import net.minecraft.block.Block;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
+import net.minecraft.util.BlockPos;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.Vec3;
+import net.minecraft.network.play.client.C08PacketPlayerBlockPlacement;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiScreen;
 import net.minecraft.client.renderer.GlStateManager;
@@ -41,6 +49,7 @@ public class ClickGui extends GuiScreen {
         COMBAT("Combat"),
         MOVEMENT("Movement"),
         RENDER("Render");
+        WORLD("World"); // Added: new category (panel), specialy for scaffold
 
         public final String title;
         Category(String title) { this.title = title; }
@@ -60,6 +69,8 @@ public class ClickGui extends GuiScreen {
 
             add(new Module("ESP", Category.RENDER));
             add(new Module("FullBright", Category.RENDER));
+
+            add(new Module("Scaffold", Category.WORLD));
         }
 
         public static void add(Module m) { modules.add(m); }
@@ -198,9 +209,27 @@ public class ClickGui extends GuiScreen {
     public static class TickHandler {
         private final Minecraft mc = Minecraft.getMinecraft();
         private float normalGamma = -1.0F;
-        private long lastAttackTime = 0; // Added for KillAura Module
+        private long lastAttackTime = 0;
+        private int lastSlot = -1; // Added for Scaffold
         public static void register() {
             MinecraftForge.EVENT_BUS.register(new TickHandler());
+        }
+
+        // Вынесено из onClientTick — исправление ошибки компиляции
+        private int findBlockSlot() {
+            for (int i = 0; i < 9; i++) {
+                ItemStack stack = mc.thePlayer.inventory.getStackInSlot(i);
+                if (stack != null && stack.getItem() instanceof ItemBlock) {
+                    return i;
+                }
+            }
+            for (int i = 9; i < 36; i++) {
+                ItemStack stack = mc.thePlayer.inventory.getStackInSlot(i);
+                if (stack != null && stack.getItem() instanceof ItemBlock) {
+                    return i;
+                }
+            }
+            return -1;
         }
 
         @SubscribeEvent
@@ -212,6 +241,7 @@ public class ClickGui extends GuiScreen {
             Module jumphack   = ModuleManager.getByName("JumpHack");
             Module fly   = ModuleManager.getByName("Fly");
             Module killaura = ModuleManager.getByName("KillAura");
+            Module scaffold = ModuleManager.getByName("Scaffold"); // Added for Scaffold
 
             // FullBright
             if (fullbright != null && fullbright.isEnabled()) {
@@ -294,7 +324,48 @@ public class ClickGui extends GuiScreen {
                     }
                 }
             }
+
+        // Added: Scaffold
+        if (scaffold != null && scaffold.isEnabled()) {
+            int bx = MathHelper.floor_double(mc.thePlayer.posX);
+            int by = MathHelper.floor_double(mc.thePlayer.posY) - 1;
+            int bz = MathHelper.floor_double(mc.thePlayer.posZ);
+            BlockPos below = new BlockPos(bx, by, bz);
+
+            if (mc.theWorld.isAirBlock(below) || mc.theWorld.getBlockState(below).getBlock().isReplaceable(mc.theWorld, below)) {
+                int blockSlot = findBlockSlot();
+                if (blockSlot != -1) {
+                    int prevSlot = mc.thePlayer.inventory.currentItem;
+                    float prevPitch = mc.thePlayer.rotationPitch;
+
+                    if (blockSlot < 9) {
+                        mc.thePlayer.inventory.currentItem = blockSlot;
+                    } else {
+                        mc.playerController.windowClick(0, blockSlot, prevSlot, 2, mc.thePlayer);
+                    }
+
+                    mc.thePlayer.rotationPitch = 90.0F;
+                    Vec3 hitVec = new Vec3(bx + 0.5, by + 1.0, bz + 0.5);
+                    mc.playerController.func_178890_a(
+                        mc.thePlayer,
+                        mc.theWorld,
+                        mc.thePlayer.getHeldItem(),
+                        below,
+                        EnumFacing.UP,
+                        hitVec
+                    );
+
+                    if (blockSlot < 9) {
+                        mc.thePlayer.inventory.currentItem = prevSlot;
+                    } else {
+                        mc.playerController.windowClick(0, blockSlot, prevSlot, 2, mc.thePlayer);
+                    }
+                    mc.thePlayer.rotationPitch = prevPitch;
+                }
+            }
         }
+
+        } // конец onClientTick
 
         // ESP
         @SubscribeEvent
