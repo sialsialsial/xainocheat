@@ -346,7 +346,7 @@ public class ClickGui extends GuiScreen {
 
                     mc.thePlayer.rotationPitch = 90.0F;
                     Vec3 hitVec = new Vec3(bx + 0.5, by + 1.0, bz + 0.5);
-                    mc.playerController.func_178890_a(
+                    mc.playerController.onPlayerRightClick(
                         mc.thePlayer,
                         mc.theWorld,
                         mc.thePlayer.getHeldItem(),
