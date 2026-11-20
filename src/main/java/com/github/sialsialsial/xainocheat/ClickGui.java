@@ -48,7 +48,7 @@ public class ClickGui extends GuiScreen {
     public enum Category {
         COMBAT("Combat"),
         MOVEMENT("Movement"),
-        RENDER("Render");
+        RENDER("Render"),
         WORLD("World"); // Added: new category (panel), specialy for scaffold
 
         public final String title;
